@@ -7,5 +7,6 @@ COPY main.py main.py
 
 RUN pip install -r requirements.txt
 EXPOSE 8000
+USER root
 
 CMD ["fastapi", "run", "main.py", "--proxy-headers", "--host", "localhost", "--port", "8000"]
