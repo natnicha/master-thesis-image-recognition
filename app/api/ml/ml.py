@@ -1,5 +1,6 @@
 import logging
 from fastapi import APIRouter, HTTPException, Query, status
+from torch import Tensor
 from torchvision.io import read_image
 from torchvision.models import efficientnet_b3, EfficientNet_B3_Weights
 
@@ -22,25 +23,29 @@ async def classify(
         )
     
     try:
-        # Step 1: Initialize model with the best available weights
-        weights = EfficientNet_B3_Weights.DEFAULT
-        model = efficientnet_b3(weights=weights)
-        model.eval()
-
-        # Step 2: Initialize the inference transforms
-        preprocess = weights.transforms()
-
-        # Step 3: Apply inference preprocessing transforms
-        batch = preprocess(img).unsqueeze(0)
-
-        # Step 4: Use the model and print the predicted category
-        prediction = model(batch).squeeze(0).softmax(0)
-        class_id = prediction.argmax().item()
-        score = prediction[class_id].item()
-        category_name = weights.meta["categories"][class_id]
+        category_name, score = predict(image=img)
     except Exception as e:
         raise HTTPException(
             detail={"message": str(e)},
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     return ClassifyResponseModel(name=category_name, score=f"{100*score:.1f}")
+
+def predict(image: Tensor):
+    # Step 1: Initialize model with the best available weights
+    weights = EfficientNet_B3_Weights.DEFAULT
+    model = efficientnet_b3(weights=weights)
+    model.eval()
+
+    # Step 2: Initialize the inference transforms
+    preprocess = weights.transforms()
+
+    # Step 3: Apply inference preprocessing transforms
+    batch = preprocess(image).unsqueeze(0)
+
+    # Step 4: Use the model and print the predicted category
+    prediction = model(batch).squeeze(0).softmax(0)
+    class_id = prediction.argmax().item()
+    score = prediction[class_id].item()
+    category_name = weights.meta["categories"][class_id]
+    return category_name, score
