@@ -6,3 +6,12 @@ run:
 
 gen-req:
 	pipenv requirements > requirements.txt
+
+docker-build:
+	docker build -t ml .
+
+docker-run:
+	docker run ml
+
+docker-compose-up:
+	docker-compose up

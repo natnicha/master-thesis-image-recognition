@@ -1,11 +1,11 @@
-FROM python:3.9-alpine
+FROM bitnami/pytorch
 
 WORKDIR /app
-COPY ./src ./src
+COPY ./app ./app
 COPY requirements.txt requirements.txt
 COPY main.py main.py
 
 RUN pip install -r requirements.txt
-EXPOSE 3000
+EXPOSE 8000
 
-CMD ["python", "uvicorn", "main:app"]
+CMD ["fastapi", "run", "main.py", "--proxy-headers", "--host", "localhost", "--port", "8000"]
