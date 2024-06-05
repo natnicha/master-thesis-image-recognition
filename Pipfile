@@ -8,6 +8,7 @@ torchvision = "*"
 torch = "*"
 ipykernel = "*"
 matplotlib = "*"
+opencv-contrib-python = "*"
 
 [dev-packages]
 
