@@ -1,2 +1,5 @@
-To activate this project's virtualenv, run 
-pipenv shell
+shell:
+	pipenv shell
+
+run:
+	python -m uvicorn main:app --reload

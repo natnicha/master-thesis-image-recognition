@@ -6,9 +6,8 @@ name = "pypi"
 [packages]
 torchvision = "*"
 torch = "*"
-ipykernel = "*"
 matplotlib = "*"
-opencv-contrib-python = "*"
+fastapi = "*"
 
 [dev-packages]
 
