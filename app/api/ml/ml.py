@@ -6,5 +6,5 @@ from app.api.ml.model import ClassifyResponseModel
 ml = APIRouter()
 
 @ml.get("/classify", response_model=ClassifyResponseModel, status_code=status.HTTP_200_OK)
-async def register():
+async def classify():
     return ClassifyResponseModel(name="Hello World")
