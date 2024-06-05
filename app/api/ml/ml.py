@@ -1,15 +1,26 @@
-from fastapi import APIRouter, status
+import logging
+from fastapi import APIRouter, HTTPException, Query, status
 from torchvision.io import read_image
 from torchvision.models import efficientnet_b3, EfficientNet_B3_Weights
 
-from app.api.ml.model import ClassifyResponseModel
+from app.api.ml.model import *
 
 ml = APIRouter()
 
 @ml.get("/classify", response_model=ClassifyResponseModel, status_code=status.HTTP_200_OK)
-async def classify():
-    img = read_image("./dataset/acinonyx-jubatus/acinonyx-jubatus_0_052c1ab2.jpg")
-
+async def classify(
+        image_path: str = Query(min_length=1, pattern='(.|\s)*\S(.|\s)*')):
+    
+    # path example: ./dataset/acinonyx-jubatus/acinonyx-jubatus_0_052c1ab2.jpg
+    try:
+        img = read_image(image_path)
+    except Exception as e:
+        logging.error(msg=str(e))
+        raise HTTPException(
+            detail={"message": str(e)},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+    
     # Step 1: Initialize model with the best available weights
     weights = EfficientNet_B3_Weights.DEFAULT
     model = efficientnet_b3(weights=weights)
