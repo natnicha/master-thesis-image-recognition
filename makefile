@@ -11,7 +11,7 @@ docker-build:
 	docker build -t ml .
 
 docker-run:
-	docker run ml
+	docker run -p 8000:3000 ml
 
 docker-compose-up:
 	docker-compose up
