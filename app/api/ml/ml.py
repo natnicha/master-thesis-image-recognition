@@ -1,6 +1,9 @@
+import io
 import logging
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile, status
 from torch import Tensor
+from PIL import Image
+import torchvision.transforms as transforms 
 from torchvision.io import read_image
 from torchvision.models import efficientnet_b3, EfficientNet_B3_Weights
 
@@ -10,20 +13,27 @@ ml = APIRouter()
 
 @ml.get("/classify", response_model=ClassifyResponseModel, status_code=status.HTTP_200_OK)
 async def classify(
-        image_path: str = Query(min_length=1, pattern='(.|\s)*\S(.|\s)*')):
+        file: UploadFile = File(...)):
     
-    # path example: ./dataset/acinonyx-jubatus/acinonyx-jubatus_0_052c1ab2.jpg
     try:
-        img = read_image(image_path)
+        image_bytes = file.file.read()
+        image = Image.open(io.BytesIO(image_bytes))
+        transform = transforms.Compose([ 
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]) 
+        img_tensor = transform(image) 
     except Exception as e:
         logging.error(msg=str(e))
         raise HTTPException(
             detail={"message": str(e)},
             status_code=status.HTTP_400_BAD_REQUEST
         )
+    finally:
+        file.file.close()
     
     try:
-        category_name, score = predict(image=img)
+        category_name, score = predict(image=img_tensor)
     except Exception as e:
         raise HTTPException(
             detail={"message": str(e)},
