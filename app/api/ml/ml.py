@@ -11,7 +11,7 @@ from app.api.ml.model import *
 
 ml = APIRouter()
 
-@ml.get("/classify", response_model=ClassifyResponseModel, status_code=status.HTTP_200_OK)
+@ml.post("/classify", response_model=ClassifyResponseModel, status_code=status.HTTP_200_OK)
 async def classify(
         file: UploadFile = File(...)):
     

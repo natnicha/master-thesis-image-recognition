@@ -1,0 +1,4 @@
+{
+    "metrics-addr" : "localhost:3000",
+    "experimental" : true
+  }
